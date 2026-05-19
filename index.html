@@ -2,148 +2,31 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>京桥刹那 · 二次元足球赛事信息</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        body {
-            font-family: system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-            background: #eef2f5;
-            color: #1a2c3e;
-            padding: 1.5rem;
-        }
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 28px;
-            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.12);
-            overflow: hidden;
-        }
-        .header {
-            background: linear-gradient(135deg, #1e2a3a 0%, #2c3e50 100%);
-            color: white;
-            padding: 1.6rem 2rem;
-        }
-        .title {
-            font-size: 1.8rem;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        .title h1 {
-            font-size: 1.7rem;
-            font-weight: 600;
-        }
-        .badge {
-            background: rgba(255,255,240,0.2);
-            backdrop-filter: blur(4px);
-            padding: 6px 14px;
-            border-radius: 60px;
-            font-size: 0.85rem;
-        }
-        .stats-bar {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 1rem;
-            gap: 15px;
-        }
-        .info-chip {
-            background: #ffffff20;
-            border-radius: 40px;
-            padding: 6px 16px;
-            font-size: 0.9rem;
-        }
-        .search-box {
-            margin-top: 1rem;
-            display: flex;
-            align-items: center;
-            background: white;
-            border-radius: 48px;
-            padding: 0 16px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
-        }
-        .search-box input {
-            width: 100%;
-            padding: 10px 0;
-            border: none;
-            outline: none;
-            font-size: 0.9rem;
-            background: transparent;
-        }
-        .search-box span {
-            color: #7f8c8d;
-            margin-right: 8px;
-        }
-        .table-wrapper {
-            overflow-x: auto;
-            overflow-y: auto;
-            max-height: 65vh;
-            border-top: 1px solid #e2edf2;
-        }
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.85rem;
-            min-width: 1100px;
-        }
-        .data-table th {
-            background: #f0f6fa;
-            color: #1f4a6e;
-            font-weight: 600;
-            padding: 14px 12px;
-            border-bottom: 2px solid #cbdde6;
-            text-align: left;
-            cursor: pointer;
-            user-select: none;
-            position: sticky;
-            top: 0;
-            z-index: 20;
-        }
-        .data-table th:hover {
-            background: #e2edf5;
-        }
-        .data-table td {
-            padding: 10px 12px;
-            border-bottom: 1px solid #e7edf2;
-            color: #2c3e4e;
-        }
-        .data-table tr:hover td {
-            background-color: #f8fbfd;
-        }
-        .sort-icon {
-            font-size: 0.7rem;
-            margin-left: 6px;
-            opacity: 0.6;
-        }
-        .loading {
-            text-align: center;
-            padding: 2rem;
-            color: #2c6e9e;
-        }
-        footer {
-            background: #f8fafc;
-            padding: 1rem 2rem;
-            font-size: 0.75rem;
-            color: #5a6e7c;
-            border-top: 1px solid #e2edf2;
-            text-align: center;
-        }
-        @media (max-width: 680px) {
-            body { padding: 0.8rem; }
-            .header { padding: 1.2rem; }
-            .title h1 { font-size: 1.3rem; }
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: system-ui, 'Segoe UI', Roboto, sans-serif; background: #eef2f5; padding: 1.5rem; }
+        .container { max-width: 1400px; margin: 0 auto; background: white; border-radius: 28px; overflow: hidden; box-shadow: 0 20px 35px -12px rgba(0,0,0,0.12); }
+        .header { background: linear-gradient(135deg, #1e2a3a, #2c3e50); color: white; padding: 1.6rem 2rem; }
+        .title { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+        .title h1 { font-size: 1.7rem; font-weight: 600; }
+        .badge { background: rgba(255,255,240,0.2); padding: 6px 14px; border-radius: 60px; font-size: 0.85rem; }
+        .stats-bar { display: flex; justify-content: space-between; margin-top: 1rem; gap: 15px; flex-wrap: wrap; }
+        .info-chip { background: #ffffff20; border-radius: 40px; padding: 6px 16px; font-size: 0.9rem; }
+        .search-box { margin-top: 1rem; display: flex; background: white; border-radius: 48px; padding: 0 16px; }
+        .search-box input { width: 100%; padding: 10px 0; border: none; outline: none; font-size: 0.9rem; background: transparent; }
+        .table-wrapper { overflow-x: auto; overflow-y: auto; max-height: 65vh; border-top: 1px solid #e2edf2; }
+        .data-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 1100px; }
+        .data-table th { background: #f0f6fa; color: #1f4a6e; padding: 14px 12px; border-bottom: 2px solid #cbdde6; text-align: left; cursor: pointer; position: sticky; top: 0; }
+        .data-table td { padding: 10px 12px; border-bottom: 1px solid #e7edf2; }
+        .data-table tr:hover td { background-color: #f8fbfd; }
+        .sort-icon { font-size: 0.7rem; margin-left: 6px; opacity: 0.6; }
+        .loading, .error-msg { text-align: center; padding: 2rem; }
+        .error-msg { color: #c0392b; background: #fef5f0; border-radius: 16px; margin: 1rem; }
+        footer { background: #f8fafc; padding: 1rem 2rem; font-size: 0.75rem; text-align: center; border-top: 1px solid #e2edf2; }
+        pre { background: #f4f4f4; padding: 1rem; overflow-x: auto; font-size: 0.75rem; margin: 1rem; border-radius: 12px; }
     </style>
 </head>
 <body>
@@ -151,80 +34,62 @@
     <div class="header">
         <div class="title">
             <h1>🏆 京桥刹那 · 二次元足球赛事信息 · <span id="recordCountSpan">0</span> 场对决</h1>
-            <div class="badge">📅 S1杯赛 → 最新赛季 | 全记录</div>
+            <div class="badge">外部 CSV 动态加载</div>
         </div>
         <div class="stats-bar">
-            <div class="info-chip" id="dataSourceBadge">📂 数据源: All_Games.csv</div>
+            <div class="info-chip" id="dataSourceBadge">📂 加载中...</div>
             <div class="info-chip" id="filteredInfo">🔍 全部显示</div>
         </div>
         <div class="search-box">
             <span>🔎</span>
-            <input type="text" id="searchInput" placeholder="搜索 球队/赛事/比分/阶段...">
+            <input type="text" id="searchInput" placeholder="搜索球队/赛事/比分...">
         </div>
     </div>
     <div class="table-wrapper">
         <table class="data-table" id="dataTable">
-            <thead id="tableHeader"><tr><th>加载赛事数据中...</th></tr></thead>
-            <tbody id="tableBody"><tr><td class="loading">⏳ 正在从 All_Games.csv 读取比赛记录，请稍候...</td></tr></tbody>
+            <thead id="tableHeader"><tr><th>加载中</th></tr></thead>
+            <tbody id="tableBody"><tr><td class="loading">⏳ 正在加载数据，请稍后...</td></tr></tbody>
         </table>
+        <div id="debugPanel" style="margin: 1rem; font-size: 0.75rem; color: #666; border-top: 1px solid #ddd; padding-top: 1rem;"></div>
     </div>
-    <footer>✨ 单击列标题排序 | 支持全局模糊搜索 | 数据文件：All_Games.csv（同目录）</footer>
+    <footer>✨ 单击列标题排序 | 全局搜索 | 数据文件：All_Games.csv（同目录）</footer>
 </div>
 
 <script>
-    // 配置：CSV 文件名（与根目录一致）
+    // 配置 CSV 文件名（与根目录一致）
     const CSV_FILE = './All_Games.csv';
-
-    let currentData = [];
-    let originalColumns = [];
-    let filteredData = [];
-    let sortColumn = null;
-    let sortAscending = true;
-    let searchKeyword = "";
-
-    // DOM 元素
+    let currentData = [], originalColumns = [], filteredData = [], sortColumn = null, sortAscending = true, searchKeyword = "";
     const searchInput = document.getElementById("searchInput");
     const recordCountSpan = document.getElementById("recordCountSpan");
     const footerTotalSpan = document.getElementById("footerTotal");
     const filteredInfoSpan = document.getElementById("filteredInfo");
     const dataSourceBadge = document.getElementById("dataSourceBadge");
+    const debugPanel = document.getElementById("debugPanel");
 
-    function showLoading(message) {
-        const tbody = document.getElementById("tableBody");
-        if (tbody) tbody.innerHTML = `<tr><td colspan="20" class="loading">${message}</td></tr>`;
-    }
-
-    function setNewData(newArray) {
-        if (!newArray || newArray.length === 0) {
+    function setNewData(data) {
+        if (!data || data.length === 0) {
             currentData = [];
             originalColumns = [];
             filteredData = [];
-            sortColumn = null;
-            sortAscending = true;
-            searchKeyword = "";
-            if (searchInput) searchInput.value = "";
             renderTable();
             return;
         }
-        currentData = [...newArray];
-        originalColumns = Object.keys(currentData[0]);
+        currentData = data;
+        originalColumns = Object.keys(data[0]);
         sortColumn = null;
         sortAscending = true;
         searchKeyword = "";
         if (searchInput) searchInput.value = "";
         filteredData = [...currentData];
         renderTable();
-        dataSourceBadge.innerHTML = `📂 数据源: All_Games.csv (${currentData.length}场)`;
+        dataSourceBadge.innerHTML = `📂 数据源: ${CSV_FILE} (${currentData.length}场)`;
     }
 
     function applySearchFilter() {
-        if (!searchKeyword.trim()) {
-            filteredData = [...currentData];
-        } else {
+        if (!searchKeyword.trim()) filteredData = [...currentData];
+        else {
             const kw = searchKeyword.trim().toLowerCase();
-            filteredData = currentData.filter(row => 
-                Object.values(row).some(v => v != null && String(v).toLowerCase().includes(kw))
-            );
+            filteredData = currentData.filter(row => Object.values(row).some(v => v != null && String(v).toLowerCase().includes(kw)));
         }
         renderTable();
     }
@@ -232,60 +97,43 @@
     function renderTable() {
         const headerRow = document.getElementById("tableHeader");
         const tbody = document.getElementById("tableBody");
-
         if (!currentData.length) {
             headerRow.innerHTML = `<tr><th>暂无数据</th></tr>`;
-            tbody.innerHTML = `<tr><td colspan="10">暂无比赛记录，请检查 All_Games.csv 是否存在且格式正确。</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="10">暂无比赛记录，请检查 CSV 文件格式是否正确（UTF-8编码、逗号分隔、至少包含表头+一行数据）。</td></tr>`;
             recordCountSpan.innerText = "0";
             footerTotalSpan.innerText = "0";
             filteredInfoSpan.innerHTML = `🔍 无数据`;
             return;
         }
-
         let dataToRender = [...filteredData];
         if (sortColumn) {
-            dataToRender.sort((a, b) => {
-                let valA = a[sortColumn];
-                let valB = b[sortColumn];
-                const isNum = (v) => !isNaN(parseFloat(v)) && isFinite(v);
-                if (valA == null) valA = "";
-                if (valB == null) valB = "";
-                if (isNum(valA) && isNum(valB)) {
-                    valA = parseFloat(valA);
-                    valB = parseFloat(valB);
-                } else {
-                    valA = String(valA).toLowerCase();
-                    valB = String(valB).toLowerCase();
-                }
-                if (valA < valB) return sortAscending ? -1 : 1;
-                if (valA > valB) return sortAscending ? 1 : -1;
+            dataToRender.sort((a,b) => {
+                let va = a[sortColumn] ?? "", vb = b[sortColumn] ?? "";
+                let isNum = (v) => !isNaN(parseFloat(v)) && isFinite(v);
+                if (isNum(va) && isNum(vb)) { va = parseFloat(va); vb = parseFloat(vb); }
+                else { va = String(va).toLowerCase(); vb = String(vb).toLowerCase(); }
+                if (va < vb) return sortAscending ? -1 : 1;
+                if (va > vb) return sortAscending ? 1 : -1;
                 return 0;
             });
         }
-
         const columns = originalColumns;
         const thRow = document.createElement('tr');
         columns.forEach(col => {
             const th = document.createElement('th');
             th.textContent = col;
-            const iconSpan = document.createElement('span');
-            iconSpan.className = 'sort-icon';
-            iconSpan.textContent = (sortColumn === col) ? (sortAscending ? ' ▲' : ' ▼') : ' ⇅';
-            th.appendChild(iconSpan);
+            const span = document.createElement('span');
+            span.className = 'sort-icon';
+            span.textContent = (sortColumn === col) ? (sortAscending ? ' ▲' : ' ▼') : ' ⇅';
+            th.appendChild(span);
             th.addEventListener('click', () => {
-                if (sortColumn === col) {
-                    sortAscending = !sortAscending;
-                } else {
-                    sortColumn = col;
-                    sortAscending = true;
-                }
+                if (sortColumn === col) sortAscending = !sortAscending;
+                else { sortColumn = col; sortAscending = true; }
                 renderTable();
             });
             thRow.appendChild(th);
         });
-        headerRow.innerHTML = '';
-        headerRow.appendChild(thRow);
-
+        headerRow.innerHTML = ''; headerRow.appendChild(thRow);
         tbody.innerHTML = '';
         if (dataToRender.length === 0) {
             const tr = document.createElement('tr');
@@ -301,65 +149,60 @@
                 const tr = document.createElement('tr');
                 columns.forEach(col => {
                     const td = document.createElement('td');
-                    let cellValue = (row[col] !== undefined && row[col] !== null) ? row[col] : '—';
-                    td.textContent = cellValue;
+                    td.textContent = (row[col] !== undefined && row[col] !== null) ? row[col] : '—';
                     tr.appendChild(td);
                 });
                 tbody.appendChild(tr);
             });
         }
+        recordCountSpan.innerText = currentData.length.toLocaleString();
+        footerTotalSpan.innerText = currentData.length.toLocaleString();
+        filteredInfoSpan.innerHTML = (filteredData.length === currentData.length) ? `✅ 共 ${currentData.length} 场` : `🔍 筛选出 ${filteredData.length} / ${currentData.length} 场`;
+    }
 
-        const totalAll = currentData.length;
-        const filteredCount = dataToRender.length;
-        recordCountSpan.innerText = totalAll.toLocaleString();
-        footerTotalSpan.innerText = totalAll.toLocaleString();
-        if (filteredCount === totalAll) {
-            filteredInfoSpan.innerHTML = `✅ 共 ${totalAll} 场完整赛事`;
-        } else {
-            filteredInfoSpan.innerHTML = `🔍 筛选出 ${filteredCount} / ${totalAll} 场比赛`;
+    async function loadCSV() {
+        const fullUrl = new URL(CSV_FILE, window.location.href).href;
+        debugPanel.innerHTML = `<div>🔍 尝试加载: ${fullUrl}</div><div>⏳ 发送请求...</div>`;
+        try {
+            const response = await fetch(CSV_FILE, { cache: "no-store" });
+            if (!response.ok) throw new Error(`HTTP ${response.status} ${response.statusText}`);
+            const text = await response.text();
+            debugPanel.innerHTML += `<div>✅ 收到响应，文件大小: ${text.length} 字节</div>`;
+            // 显示前200个字符
+            debugPanel.innerHTML += `<details><summary>📄 CSV 前200字符预览</summary><pre>${escapeHtml(text.substring(0, 200))}</pre></details>`;
+            Papa.parse(text, {
+                header: true,
+                skipEmptyLines: true,
+                dynamicTyping: true,
+                complete: (results) => {
+                    if (results.errors.length) console.warn(results.errors);
+                    const data = results.data.filter(row => Object.values(row).some(v => v !== undefined && v !== null && v !== ""));
+                    debugPanel.innerHTML += `<div>📊 解析后有效数据行数: ${data.length}</div>`;
+                    if (data.length === 0) {
+                        debugPanel.innerHTML += `<div class="error-msg">❌ 解析后没有有效数据行。可能原因：CSV 只有表头没有数据，或分隔符不是逗号，或编码问题（请用 UTF-8 无 BOM 保存）。</div>`;
+                        setNewData([]);
+                    } else {
+                        setNewData(data);
+                    }
+                },
+                error: (err) => {
+                    debugPanel.innerHTML += `<div class="error-msg">❌ PapaParse 解析失败: ${err.message}</div>`;
+                    setNewData([]);
+                }
+            });
+        } catch (err) {
+            debugPanel.innerHTML += `<div class="error-msg">❌ 网络请求失败: ${err.message}<br>请确认文件 "${CSV_FILE}" 位于网站根目录，且文件名大小写正确。</div>`;
+            setNewData([]);
         }
     }
 
-    // 加载 CSV
-    function loadCSV() {
-        showLoading(`⏳ 正在从 ${CSV_FILE} 加载数据...`);
-        fetch(CSV_FILE, { cache: "no-store" })
-            .then(res => {
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                return res.text();
-            })
-            .then(csvText => {
-                Papa.parse(csvText, {
-                    header: true,
-                    skipEmptyLines: true,
-                    dynamicTyping: true,
-                    complete: (results) => {
-                        if (results.errors.length) console.warn(results.errors);
-                        let data = results.data.filter(row => Object.values(row).some(v => v != null && v !== ""));
-                        if (data.length === 0) throw new Error("CSV 无有效数据行");
-                        setNewData(data);
-                    },
-                    error: (err) => { throw new Error("解析失败: " + err.message); }
-                });
-            })
-            .catch(err => {
-                console.error(err);
-                showLoading(`❌ 加载失败: ${err.message}<br>请确认文件 "${CSV_FILE}" 位于网站根目录且格式为 UTF-8`);
-                setNewData([]);
-            });
-    }
+    function escapeHtml(str) { return str.replace(/[&<>]/g, function(m){if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
 
-    // 搜索防抖
     let debounceTimer;
     searchInput.addEventListener("input", (e) => {
         clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(() => {
-            searchKeyword = e.target.value;
-            applySearchFilter();
-        }, 250);
+        debounceTimer = setTimeout(() => { searchKeyword = e.target.value; applySearchFilter(); }, 250);
     });
-
-    // 启动
     loadCSV();
 </script>
 </body>
