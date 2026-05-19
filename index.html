@@ -276,16 +276,16 @@
     </div>
     <footer>
         <span>✨ 单击列标题排序 | 支持全局模糊搜索 | 外部CSV动态加载，便于持续新增比赛</span>
-        <span>⚡ 数据文件: <strong id="csvFileHint">./全部比赛记录.csv</strong> | 上传新CSV可临时替换</span>
+        <span>⚡ 数据文件: <strong id="csvFileHint">./All_Games.csv</strong> | 上传新CSV可临时替换</span>
     </footer>
 </div>
 
 <script>
     // ----------------------------------------------
     // 全局配置：外部 CSV 文件路径（请根据实际部署位置修改）
-    // 可将 CSV 放在仓库根目录，命名为 "全部比赛记录.csv"
+    // 可将 CSV 放在仓库根目录，命名为 "All_Games.csv"
     // ----------------------------------------------
-    const DEFAULT_CSV_PATH = './全部比赛记录.csv';
+    const DEFAULT_CSV_PATH = './All_Games.csv';
 
     // 全局状态
     let currentData = [];          // 原始数据（对象数组）
