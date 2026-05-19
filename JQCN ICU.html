@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>京桥刹那 · 二次元足球赛事信息</title>
+    <!-- PapaParse: 稳健解析CSV -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: system-ui, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+            background: #eef2f5;
+            color: #1a2c3e;
+            padding: 1.5rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 28px;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.12);
+            overflow: hidden;
+            transition: all 0.2s ease;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e2a3a 0%, #2c3e50 100%);
+            color: white;
+            padding: 1.6rem 2rem;
+        }
+
+        .title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+
+        .title h1 {
+            font-size: 1.7rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .badge {
+            background: rgba(255,255,240,0.2);
+            backdrop-filter: blur(4px);
+            padding: 6px 14px;
+            border-radius: 60px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .stats-bar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1rem;
+            gap: 15px;
+        }
+
+        .info-chip {
+            background: #ffffff20;
+            border-radius: 40px;
+            padding: 6px 16px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 1rem;
+        }
+
+        button, .file-label {
+            background: white;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: 0.2s;
+            color: #1e4663;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        button:hover, .file-label:hover {
+            background: #eef2f8;
+            transform: translateY(-1px);
+            box-shadow: 0 8px 18px rgba(0,0,0,0.1);
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .search-box {
+            flex: 2;
+            min-width: 220px;
+            background: white;
+            border-radius: 48px;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 0;
+            border: none;
+            outline: none;
+            font-size: 0.9rem;
+            background: transparent;
+        }
+
+        .search-box span {
+            color: #7f8c8d;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            overflow-y: auto;
+            max-height: 65vh;
+            border-top: 1px solid #e2edf2;
+            position: relative;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            min-width: 1100px;
+        }
+
+        .data-table th {
+            background: #f0f6fa;
+            color: #1f4a6e;
+            font-weight: 600;
+            padding: 14px 12px;
+            border-bottom: 2px solid #cbdde6;
+            text-align: left;
+            cursor: pointer;
+            user-select: none;
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            backdrop-filter: blur(4px);
+            transition: background 0.1s;
+        }
+
+        .data-table th:hover {
+            background: #e2edf5;
+        }
+
+        .data-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #e7edf2;
+            color: #2c3e4e;
+        }
+
+        .data-table tr:hover td {
+            background-color: #f8fbfd;
+        }
+
+        .sort-icon {
+            font-size: 0.7rem;
+            margin-left: 6px;
+            opacity: 0.6;
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 3rem;
+            background: #fef8e7;
+            color: #b96f0f;
+            border-radius: 20px;
+            margin: 1rem;
+        }
+
+        footer {
+            background: #f8fafc;
+            padding: 1rem 2rem;
+            font-size: 0.75rem;
+            color: #5a6e7c;
+            border-top: 1px solid #e2edf2;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .highlight {
+            font-weight: 700;
+            color: #0f5b8c;
+        }
+
+        .loading-indicator {
+            text-align: center;
+            padding: 2rem;
+            color: #2c6e9e;
+            font-weight: 500;
+        }
+
+        @media (max-width: 680px) {
+            body {
+                padding: 0.8rem;
+            }
+            .header {
+                padding: 1.2rem;
+            }
+            .title h1 {
+                font-size: 1.3rem;
+            }
+            button, .file-label {
+                padding: 6px 14px;
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div class="title">
+            <h1>🏆 京桥刹那 · 二次元足球赛事信息 · <span id="recordCountSpan">0</span> 场对决</h1>
+            <div class="badge">📅 S1杯赛 → S8春季赛 | 全记录·外部动态加载</div>
+        </div>
+        <div class="stats-bar">
+            <div class="info-chip" id="dataSourceBadge">📂 数据源: 加载外部 CSV ...</div>
+            <div class="info-chip" id="filteredInfo">🔍 全部显示</div>
+        </div>
+        <div class="controls">
+            <div class="search-box">
+                <span>🔎</span>
+                <input type="text" id="searchInput" placeholder="搜索 球队/赛事/比分/阶段...">
+            </div>
+            <label class="file-label">
+                📂 上传 CSV
+                <input type="file" id="uploadCsv" accept=".csv">
+            </label>
+            <button id="exportBtn">💾 导出当前数据 (CSV)</button>
+            <button id="reloadExternalBtn">🔄 重新加载外部CSV</button>
+        </div>
+    </div>
+
+    <div class="table-wrapper">
+        <table class="data-table" id="dataTable">
+            <thead id="tableHeader">
+                <tr><th>加载赛事数据中...</th></tr>
+            </thead>
+            <tbody id="tableBody">
+                <tr><td colspan="12" class="loading-indicator">⏳ 正在从外部 CSV 读取比赛记录，请稍候...</td></tr>
+            </tbody>
+        </table>
+    </div>
+    <footer>
+        <span>✨ 单击列标题排序 | 支持全局模糊搜索 | 外部CSV动态加载，便于持续新增比赛</span>
+        <span>⚡ 数据文件: <strong id="csvFileHint">./全部比赛记录.csv</strong> | 上传新CSV可临时替换</span>
+    </footer>
+</div>
+
+<script>
+    // ----------------------------------------------
+    // 全局配置：外部 CSV 文件路径（请根据实际部署位置修改）
+    // 可将 CSV 放在仓库根目录，命名为 "全部比赛记录.csv"
+    // ----------------------------------------------
+    const DEFAULT_CSV_PATH = './全部比赛记录.csv';
+
+    // 全局状态
+    let currentData = [];          // 原始数据（对象数组）
+    let originalColumns = [];      // 列名数组
+    let filteredData = [];          // 搜索/排序后的数据
+    let sortColumn = null;
+    let sortAscending = true;
+    let searchKeyword = "";
+    let currentSource = "external"; // external / upload
+
+    // DOM 元素
+    const searchInput = document.getElementById("searchInput");
+    const uploadCsvInput = document.getElementById("uploadCsv");
+    const exportBtn = document.getElementById("exportBtn");
+    const reloadBtn = document.getElementById("reloadExternalBtn");
+    const recordCountSpan = document.getElementById("recordCountSpan");
+    const footerTotalSpan = document.getElementById("footerTotal");
+    const filteredInfoSpan = document.getElementById("filteredInfo");
+    const dataSourceBadge = document.getElementById("dataSourceBadge");
+    const csvFileHintSpan = document.getElementById("csvFileHint");
+
+    // 显示加载中状态
+    function showLoadingStatus(message) {
+        const tbody = document.getElementById("tableBody");
+        if (tbody) {
+            tbody.innerHTML = `<tr><td colspan="20" class="loading-indicator">⏳ ${message}</td></tr>`;
+        }
+    }
+
+    // 核心：设置新数据（重置排序、搜索）
+    function setNewData(newArray, sourceType = "external", sourceName = "") {
+        if (!newArray || newArray.length === 0) {
+            currentData = [];
+            originalColumns = [];
+            filteredData = [];
+            sortColumn = null;
+            sortAscending = true;
+            searchKeyword = "";
+            if (searchInput) searchInput.value = "";
+            renderTable();
+            return;
+        }
+        currentData = [...newArray];
+        originalColumns = Object.keys(currentData[0]);
+        // 重置排序和搜索
+        sortColumn = null;
+        sortAscending = true;
+        searchKeyword = "";
+        if (searchInput) searchInput.value = "";
+        filteredData = [...currentData];
+        currentSource = sourceType;
+        renderTable();
+
+        // 更新数据源徽章提示
+        let badgeText = "";
+        if (sourceType === "external") {
+            badgeText = `📂 数据源: 外部CSV (${currentData.length}场)`;
+        } else if (sourceType === "upload") {
+            badgeText = `📤 数据源: 用户上传 (${currentData.length}场)`;
+        } else {
+            badgeText = `📊 数据源: ${sourceName || "自定义"} (${currentData.length}场)`;
+        }
+        dataSourceBadge.innerHTML = badgeText;
+    }
+
+    // 搜索过滤
+    function applySearchFilter() {
+        if (!searchKeyword.trim()) {
+            filteredData = [...currentData];
+        } else {
+            const kw = searchKeyword.trim().toLowerCase();
+            filteredData = currentData.filter(row => {
+                return Object.values(row).some(value => {
+                    if (value === undefined || value === null) return false;
+                    return String(value).toLowerCase().includes(kw);
+                });
+            });
+        }
+        renderTable();
+    }
+
+    // 渲染表格（含排序）
+    function renderTable() {
+        const headerRow = document.getElementById("tableHeader");
+        const tbody = document.getElementById("tableBody");
+
+        if (!currentData.length) {
+            headerRow.innerHTML = `<tr><th>暂无数据</th></tr>`;
+            tbody.innerHTML = `<tr><td colspan="12">暂无比赛记录，请重新加载外部CSV或上传文件。</td></tr>`;
+            recordCountSpan.innerText = "0";
+            footerTotalSpan.innerText = "0";
+            filteredInfoSpan.innerHTML = `🔍 无数据`;
+            return;
+        }
+
+        // 排序 (基于 filteredData)
+        let dataToRender = [...filteredData];
+        if (sortColumn) {
+            dataToRender.sort((a, b) => {
+                let valA = a[sortColumn];
+                let valB = b[sortColumn];
+                const isNumber = (v) => !isNaN(parseFloat(v)) && isFinite(v);
+                if (valA === undefined || valA === null) valA = "";
+                if (valB === undefined || valB === null) valB = "";
+                if (isNumber(valA) && isNumber(valB)) {
+                    valA = parseFloat(valA);
+                    valB = parseFloat(valB);
+                } else {
+                    valA = String(valA).toLowerCase();
+                    valB = String(valB).toLowerCase();
+                }
+                if (valA < valB) return sortAscending ? -1 : 1;
+                if (valA > valB) return sortAscending ? 1 : -1;
+                return 0;
+            });
+        }
+
+        const columns = originalColumns.length ? originalColumns : Object.keys(currentData[0]);
+        // 表头
+        const thRow = document.createElement('tr');
+        columns.forEach(col => {
+            const th = document.createElement('th');
+            th.textContent = col;
+            const currentSortIcon = (sortColumn === col) ? (sortAscending ? ' ▲' : ' ▼') : ' ⇅';
+            const iconSpan = document.createElement('span');
+            iconSpan.className = 'sort-icon';
+            iconSpan.textContent = currentSortIcon;
+            th.appendChild(iconSpan);
+            th.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (sortColumn === col) {
+                    sortAscending = !sortAscending;
+                } else {
+                    sortColumn = col;
+                    sortAscending = true;
+                }
+                renderTable();
+            });
+            thRow.appendChild(th);
+        });
+        headerRow.innerHTML = '';
+        headerRow.appendChild(thRow);
+
+        // 表格体
+        tbody.innerHTML = '';
+        if (dataToRender.length === 0) {
+            const tr = document.createElement('tr');
+            const td = document.createElement('td');
+            td.colSpan = columns.length;
+            td.textContent = '⚠️ 没有匹配的比赛，试试修改搜索词或重新加载CSV。';
+            td.style.textAlign = 'center';
+            td.style.padding = '2rem';
+            tr.appendChild(td);
+            tbody.appendChild(tr);
+        } else {
+            dataToRender.forEach(row => {
+                const tr = document.createElement('tr');
+                columns.forEach(col => {
+                    const td = document.createElement('td');
+                    let cellValue = (row[col] !== undefined && row[col] !== null) ? row[col] : '—';
+                    if (col === '主队进球' || col === '客队进球' || col === '单场进球数') {
+                        td.style.fontWeight = '500';
+                        td.style.color = '#1e6f5c';
+                    }
+                    td.textContent = cellValue;
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+        }
+
+        // 更新统计信息
+        const totalAll = currentData.length;
+        const filteredCount = dataToRender.length;
+        recordCountSpan.innerText = totalAll.toLocaleString();
+        footerTotalSpan.innerText = totalAll.toLocaleString();
+        if (filteredCount === totalAll) {
+            filteredInfoSpan.innerHTML = `✅ 共 ${totalAll} 场完整赛事`;
+        } else {
+            filteredInfoSpan.innerHTML = `🔍 筛选出 ${filteredCount} / ${totalAll} 场比赛`;
+        }
+    }
+
+    // 从CSV文本解析并设置数据
+    function parseCSVAndSetData(csvText, sourceType, sourceDesc = "") {
+        Papa.parse(csvText, {
+            header: true,
+            skipEmptyLines: true,
+            dynamicTyping: true,
+            complete: function(results) {
+                if (results.errors && results.errors.length) {
+                    console.warn("CSV解析警告:", results.errors);
+                }
+                let data = results.data;
+                if (!data || data.length === 0) {
+                    alert("CSV文件无有效数据行，请检查格式。");
+                    showLoadingStatus("加载失败：CSV无数据");
+                    return;
+                }
+                // 过滤全空行
+                data = data.filter(row => Object.values(row).some(v => v !== undefined && v !== null && v !== ""));
+                if (data.length === 0) {
+                    alert("CSV文件没有有效数据行（可能全为空）。");
+                    showLoadingStatus("加载失败：无有效记录");
+                    return;
+                }
+                setNewData(data, sourceType, sourceDesc);
+                console.log(`✅ 成功加载 ${data.length} 场比赛 (来源: ${sourceType})`);
+            },
+            error: function(err) {
+                console.error("解析错误:", err);
+                alert("CSV解析失败，请确保文件格式为UTF-8编码且包含表头。");
+                showLoadingStatus("解析失败，请检查CSV格式");
+            }
+        });
+    }
+
+    // 从外部URL加载CSV
+    function loadExternalCSV(url) {
+        showLoadingStatus(`正在从 ${url} 加载赛事数据...`);
+        fetch(url, {
+            cache: "no-store", // 避免缓存，确保获取最新
+            headers: { "Cache-Control": "no-cache" }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: 无法加载CSV文件`);
+            }
+            return response.text();
+        })
+        .then(csvText => {
+            // 检查是否为空或明显不是CSV
+            if (!csvText || csvText.trim().length === 0) {
+                throw new Error("CSV文件内容为空");
+            }
+            parseCSVAndSetData(csvText, "external", `外部文件: ${url}`);
+            // 更新底部提示
+            csvFileHintSpan.innerText = url;
+        })
+        .catch(err => {
+            console.error("加载外部CSV失败:", err);
+            alert(`无法加载外部CSV文件: ${err.message}\n请确保文件 "${url}" 存在于网站根目录，或使用“上传CSV”功能。`);
+            showLoadingStatus(`加载失败: ${err.message}，可尝试上传CSV`);
+            // 设置为空数据，避免空白页面混乱
+            setNewData([], "external", "加载失败");
+        });
+    }
+
+    // 上传文件处理
+    function handleUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        showLoadingStatus(`正在解析上传文件: ${file.name} ...`);
+        Papa.parse(file, {
+            header: true,
+            skipEmptyLines: true,
+            dynamicTyping: true,
+            complete: function(results) {
+                if (results.errors && results.errors.length) console.warn(results.errors);
+                let data = results.data.filter(row => Object.values(row).some(v => v !== undefined && v !== null && v !== ""));
+                if (data.length === 0) {
+                    alert("上传的CSV无有效数据");
+                    showLoadingStatus("上传失败: 无有效记录");
+                    return;
+                }
+                setNewData(data, "upload", `上传文件: ${file.name}`);
+                // 重置文件选择器的值，以便再次上传同一文件
+                event.target.value = '';
+            },
+            error: function(err) {
+                alert("解析上传文件失败，请检查CSV格式");
+                console.error(err);
+                showLoadingStatus("解析失败");
+                event.target.value = '';
+            }
+        });
+    }
+
+    // 导出当前数据 (currentData) 为CSV
+    function exportToCSV() {
+        if (!currentData.length) {
+            alert("无数据可导出，请先加载外部CSV或上传文件。");
+            return;
+        }
+        const columns = originalColumns.length ? originalColumns : Object.keys(currentData[0]);
+        let csvRows = [];
+        csvRows.push(columns.join(","));
+        for (const row of currentData) {
+            const values = columns.map(col => {
+                let val = row[col] !== undefined && row[col] !== null ? row[col] : "";
+                if (typeof val === "string" && (val.includes(",") || val.includes("\"") || val.includes("\n"))) {
+                    val = `"${val.replace(/"/g, '""')}"`;
+                }
+                return val;
+            });
+            csvRows.push(values.join(","));
+        }
+        const blob = new Blob(["\uFEFF" + csvRows.join("\n")], { type: "text/csv;charset=utf-8;" });
+        const link = document.createElement("a");
+        const url = URL.createObjectURL(blob);
+        link.href = url;
+        link.setAttribute("download", `京桥刹那_赛事数据_${new Date().toISOString().slice(0,19)}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    }
+
+    // 重置/重新加载外部CSV
+    function reloadExternal() {
+        loadExternalCSV(DEFAULT_CSV_PATH);
+    }
+
+    // 搜索防抖
+    let debounceTimer;
+    function onSearchInput(e) {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+            searchKeyword = e.target.value;
+            applySearchFilter();
+        }, 250);
+    }
+
+    // 初始化页面
+    function init() {
+        // 绑定事件
+        if (searchInput) searchInput.addEventListener("input", onSearchInput);
+        if (uploadCsvInput) uploadCsvInput.addEventListener("change", handleUpload);
+        if (exportBtn) exportBtn.addEventListener("click", exportToCSV);
+        if (reloadBtn) reloadBtn.addEventListener("click", reloadExternal);
+        
+        // 显示默认csv路径提示
+        csvFileHintSpan.innerText = DEFAULT_CSV_PATH;
+        
+        // 启动自动加载外部CSV
+        loadExternalCSV(DEFAULT_CSV_PATH);
+    }
+
+    // 启动一切
+    init();
+</script>
+</body>
+</html>
